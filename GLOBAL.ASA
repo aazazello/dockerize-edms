@@ -1,0 +1,212 @@
+<!--#INCLUDE file="config\variables.inc" --> 
+<SCRIPT LANGUAGE="VBScript" RUNAT=Server>
+Sub SetPayDoxPars
+
+
+    Dim sDbServer, sDb, sDbArchive,sDbUser,sDbPass,sMobileUser, sSystemLang, sColorSheme, sSmtp, sSmtpAuth, sSmtpUser,sSmtpPass
+
+    Application("Message") = "" 
+   
+    Application("SystemStopped") = False
+    'Application("SystemStopped") = True
+    Application("MessageIfSystemStopped") = ""
+    Application("MessageIfSystemStopped") ="��������, ������� ����������� ��� ���������� ����������� �����������..."
+    'Application("MessageIfSystemStopped") ="Sorry, the system is stopped for maintenance procedures..."
+
+    sMobileUser = ConfigGetRuntimeVariable("EDMS_MOBILE_USER")
+    sDbServer = ConfigGetRuntimeVariable("EDMS_DB_HOST")
+    sDb = ConfigGetRuntimeVariable("EDMS_DB_NAME")
+    sDbUser = ConfigGetRuntimeVariable("EDMS_DB_USER")
+    sDbPass = ConfigGetRuntimeVariable("EDMS_DB_PASS")
+    sSystemLang = ConfigGetRuntimeVariable("EDMS_LANG")
+    sColorSheme = ConfigGetRuntimeVariable("EDMS_COLOR_SCHEME")
+    sSmtp = ConfigGetRuntimeVariable("EDMS_SMTP_HOST")
+    sSmtpAuth = ConfigGetRuntimeVariable("EDMS_SMTP_AUTH_TYPE")
+    sSmtpUser = ConfigGetRuntimeVariable("EDMS_SMTP_USER")
+    sSmtpPass = ConfigGetRuntimeVariable("EDMS_SMTP_PASS")
+
+    'Application("SystemLangRUS") = 1   '1 = RUS,  0 = ENG
+    'Application("MobileImpersonatedAccount") = "LOCAL\rgm-as-PDXmclient"
+    Application("MobileImpersonatedAccount") = sMobileUser
+
+    If sSystemLang = "RUS" Then
+        Application("SystemLangRUS") = 1   '1 = RUS
+    Else
+        Application("SystemLangRUS") = 0   '0 = ENG
+    End If
+
+    Application("FixLang") = 0   '1 = not fixed
+    'Application("FixLang") = 1   '1 = fix rus
+    'Application("FixLang") = 2   '1 = fix eng
+
+    Application("ColorScheme") = sColorSheme
+    'Application("ColorScheme") = "1" 'BLUE
+    'Application("ColorScheme") = "2" 'GRAY
+    'Application("ColorScheme") = "3" 'AQUA    
+    'Application("ColorScheme") = "4" 'BLUEGRAY    
+
+    'Application("sLogoSmall") = "NOLOGO" 
+    Application("sLogoSmall") = "y"
+
+    Application("Hits") = 0
+
+    'MS SQL - Enterprise version 'you may use Provider=sqloledb;
+    'Application("ConnectString") = "Provider=msdasql;Database=paydox-epd-2-14;DRIVER=SQL Server;SERVER=stone-m2.local;UID=paydox-sys;PWD=!QAZ1qaz;APP=PayDox Smart Enterprise Suite" 
+    'Application("ConnectStringRUS") = "Provider=msdasql;Database=paydox-epd-2-14;DRIVER=SQL Server;SERVER=stone-m2.local;UID=paydox-sys;PWD=!QAZ1qaz;APP=PayDox Smart Enterprise Suite" 
+    'Application("ConnectStringCOM") = "Data Source=stone-m2.local;Initial Catalog=paydox-epd-2-14;User ID=paydox-sys;Password=!QAZ1qaz"
+
+    'Application("ConnectStringArchive") = "Provider=msdasql;Database=paydox-arc-epd-2-14;DRIVER=SQL Server;SERVER={DBSERVER};UID=paydox-sys;PWD=!QAZ1qaz;APP=PayDox Smart Enterprise Suite" 
+    'Application("ConnectStringArchiveRUS") = "Provider=msdasql;Database=paydox-arc-epd-2-14;DRIVER=SQL Server;SERVER={DBSERVER};UID=paydox-sys;PWD=!QAZ1qaz;APP=PayDox Smart Enterprise Suite" 
+
+    Application("ConnectString") = "Provider=msdasql;Database=" + sDb + ";DRIVER=SQL Server;SERVER=" + sDbServer + ";UID=" + sDbUser + ";PWD=" + sDbPass + ";APP=PayDox Smart Enterprise Suite" 
+    Application("ConnectStringRUS") = "Provider=msdasql;Database=" + sDb + ";DRIVER=SQL Server;SERVER=" + sDbServer + ";UID=" + sDbUser + ";PWD=" + sDbPass + ";APP=PayDox Smart Enterprise Suite" 
+    Application("ConnectStringCOM") = "Data Source=" + sDbServer + ";Initial Catalog=" + sDb + ";User ID=" + sDbUser + ";Password=" + sDbPass + ";"
+
+    Application("ConnectStringArchive") = "Provider=msdasql;Database=" + sDbArchive + ";DRIVER=SQL Server;SERVER=" + sDbServer + ";UID=" + sDbUser + ";PWD=" + sDbPass + ";APP=PayDox Smart Enterprise Suite" 
+    Application("ConnectStringArchiveRUS") = "Provider=msdasql;Database=" + sDbArchive + ";DRIVER=SQL Server;SERVER=" + sDbServer + ";UID=" + sDbUser + ";PWD=" + sDbPass + ";APP=PayDox Smart Enterprise Suite" 
+    
+    
+   'MS Access - Light version
+    'Application("ConnectStringLight") = "Provider=msdasql;Driver={Microsoft Access Driver (*.mdb)};DBQ="+Application("PayDoxHomeDir")+"DataBase\PayDox.mdb;"
+    'Application("ConnectStringLightRUS") = "Provider=msdasql;Driver={Microsoft Access Driver (*.mdb)};DBQ="+Application("PayDoxHomeDir")+"DataBase\PayDoxRUS.mdb;"
+
+    'Application("ConnectStringArchiveLight") = "Provider=msdasql;Driver={Microsoft Access Driver (*.mdb)};DBQ="+Application("PayDoxHomeDir")+"DataBase\PayDoxArchive.mdb;"
+    'Application("ConnectStringArchiveLightRUS") = "Provider=msdasql;Driver={Microsoft Access Driver (*.mdb)};DBQ="+Application("PayDoxHomeDir")+"DataBase\PayDoxArchiveRUS.mdb;"
+
+    Application("PathDebugLog") = Application("PayDoxHomeDir")+"DebugLog\"
+    Application("PathRoot") = Application("PayDoxHomeDir")
+
+    'Application("PathDocFiles") = Application("PayDoxHomeDir")+"DocFiles\"
+    Application("PathDocFiles") = "C:\PayDoxDocuments\"
+    Application("PathDocFiles_subfolder") = CStr(DatePart("yyyy", Now)) & right("0" & CStr(DatePart("m", Now)) ,2) & "\"
+
+    'Application("PathArchiveFiles")=Application("PayDoxHomeDir")+"ArchiveFiles\" 
+    Application("PathArchiveFiles")="C:\PayDoxArchiveFiles\"
+    
+    'Application("PathUploads") = Application("PayDoxHomeDir")+"Uploads\"
+    Application("PathUploads") ="C:\PayDoxUploads\"
+
+    'Application("PathDownloads") = Application("PayDoxHomeDir")+"downloads\"
+    Application("PathDownloads") = "C:\PayDoxDownloads\"
+    Application("URLDownloads") = "downloads/"
+
+    Application("PathTemplateFiles") = Application("PayDoxHomeDir")+"Templates\"
+
+    Application("sVersion") = "MSSQL"
+    'Application("sVersion") = "MSACCESS"
+    'Application("bDEMO") = True 'True for demo-version
+    Application("bDEMO") = False 'True for demo-version
+
+    Application("EmailON") = True
+    'Application("EmailON") = False
+    Application("Email2ON") = True
+    'Application("Email2ON") = False
+
+    'Application("SMSMessagingON") = True
+    Application("SMSMessagingON") = False
+    Application("SMSPortNumber")=6
+
+    Application("MSOfficeON") = True
+    'Application("MSOfficeVisible") = True
+    Application("MSOfficeVisible") = False
+
+    Application("LoginUpload") = False
+
+    Application("CompanyNameRUS")=""
+    Application("CompanyName")=""
+    Application("oWord")=""
+
+    Application("CompanyDirectoryON")=False
+    Application("CompanyConnectStringRUS") = "DSN=PayDoxCompanyRUS;UID=sa;PWD=;"
+    Application("CompanyConnectString") = "DSN=PayDoxCompanyRUS;UID=sa;PWD=;"
+
+    Server.ScriptTimeout = 6000 
+    'Server.ScriptTimeout = 1200 
+
+    Application("PathIndex") = Application("PayDoxHomeDir")+"Index\" 'Full search index
+    Application("IsFullIndexSearch") = True 'Full search index On/Off
+    'Application("IsFullIndexSearch") = False 'Full search index On/Off
+
+    'Application("Use1CInterface") = True
+    Application("Use1CInterface") = False
+    Application("1CServer") = "WWW"
+
+    Application("UseMailAttachments") = True 'If e-mail attachent should be processed
+    Application("MailName") = "PayDox " ' PayDox incoming mail box name
+    'Application("MailAddress") = "PAYDOX <paydoxmailbox@yourcompany.com>" ' PayDox incoming e-mail full address�
+    Application("MailAddress") = "paydox@local"  ' PayDox incoming e-mail full address�
+
+    Application("IsNotUseDefaultSMTPVirtualServer") = "Y" 'Use external network SMTP Service
+    'Application("IsNotUseDefaultSMTPVirtualServer") = "" 'Use Windows Default SMTP Virtual Server under IIS
+
+	'external network SMTP Service parameters
+	'Application("SMTPServer")= "127.0.0.1"
+	Application("SMTPServer")= sSmtp
+	Application("SMTPServerPort") = 25
+	Application("SMTPConnectionTimeout") = 30
+    If sSmtpAuth = "ON" Then
+	    Application("SMTPAuthenticate") = 1
+    Else
+	    Application("SMTPAuthenticate") = 0
+    End If
+	'Application("SendUserName") = "LOCAL\pdx-test"
+	Application("SendUserName") = sSmtpUser
+	'Application("SendPassword")  = "{PDX-TEST-PASSWORD}"
+	Application("SendPassword")  = sSmtpPass
+	Application("SMTPUseSSL") = False
+	Application("EmailSender") = "net.tcp://localhost:9000/EmailSender"
+
+    '��������� ��� ����������� ��������(���)
+	Application("ServiceUserName") = "" '"LOCAL\pdx-test"
+	Application("ServicePassword")  = "" '"{PDX-TEST-PASSWORD}"
+
+    Application("SystemMailDir") = "C:\Inetpub\mailroot\drop"
+    Application("MailPickupDirectory") = "C:\Inetpub\mailroot\Pickup"
+   
+    'Application("IsDebugMode") = False
+    Application("IsDebugMode") = True
+
+    Application("MailListExtDataNameContext") = "E-mail" 'Change to your common context for the all mail list database names
+    Application("PrintsExtDataNameContext") = "MS Word" 'Change to your common context for the all mass printing database names
+
+    Application("ContactEMail") = "support_"+CStr(Year(Date))+"_"+CStr(Int((Month(Date)-1)/3)+1)
+    Application("SupportEMail") = Application("ContactEMail")+ "@paybot.com" 'Your Company support e-mail may be provided here
+    Application("IsPostcardLog")=""
+    Application("IsPaymentPart")="Y" 'Permit partial payments - requires field Amount as currency in table COMMENTS
+    'Application("IsPaymentPart")="" 'Do NOT permit partial payments
+    Application("IsPaymentAccounts")="Y" 'Money Accounts transactions Support - use document category "Accounts" to provide payment transactions (text variable DOCS_Money_Accounts in TEXTANSI.TXT)
+    'Application("IsPaymentAccounts")=""
+
+    Application("IsConfirmReadEMailNotification")="Y" 'Confirm read e-mail notification via http from e-mails, received by users
+    'Application("IsConfirmReadEMailNotification")="" 'Not to confirm read e-mail notifications 
+
+    Application("IsAutoLogin")="N" 'Permit AutoLogin
+    Application("IsPublicLogin")="" 'Permit PublicLogin
+
+    Application("AutoMessages") = "N"
+
+    'Application("PartnerServiceEndpoint") = "Service/PartnerService.svc/partners/{PARTNERNAME}/byname"
+    Application("PartnerServiceEndpoint") = "Service/PartnerService.svc/partners/checkpartner/json"
+
+    Application("CCSPath") = "compliance/"
+
+    Application("ReadCohesionType") = False
+End Sub
+
+Sub Application_OnStart
+	Application("AppDateTime")=Now
+	SetPayDoxPars
+End Sub
+
+Sub Session_OnStart
+    Session.LCID=1033
+    Session("bBPROCESS")="y"
+End Sub
+
+Sub Session_OnEnd
+	Application.Contents.Remove ("UserID" + CStr(Session.SessionID))
+	Application.Contents.Remove ("UserTime" + CStr(Session.SessionID))
+	Application.Contents.Remove ("UserIP" + CStr(Session.SessionID))
+End Sub
+
+</SCRIPT>
